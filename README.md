@@ -1,12 +1,12 @@
 
-This simple projects provides bootstrap to provision MacOS workstations with
-basic tools as well as a MacOs as a CI using concourse. The ansible playbook will:
+This simple project provides an ansible playbook to provision MacOS workstations with
+basic tools as well as a MacOs CI using concourse. The ansible playbook will:
 
 - Install pairing tools (git-duet)
 - Install basic encryption tools (git-crypt)
 - Propagate SSH keys and DNS config
 - Install and run concourse in docker-compose setup
-- Provides bootstrap for docker image that could be used in concourse
+- Provide a template for a docker image that could be used in concourse
 - Provide means to automate docker image deployment
 
 In order to get started:
