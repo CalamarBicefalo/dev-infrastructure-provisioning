@@ -1,0 +1,5 @@
+Host devmachine1
+  HostName devmachine1.local
+
+Host cimachine
+  HostName cimachine1.local

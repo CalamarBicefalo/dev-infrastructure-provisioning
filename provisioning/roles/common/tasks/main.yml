@@ -1,0 +1,12 @@
+- name: Set authorized keys
+  authorized_key:
+    user: '{{ username }}'
+    key: "{{ lookup('file', item) }}"
+    state: present
+  with_fileglob:
+    - "public_keys/*"
+
+- name: Install docker
+  homebrew_cask:
+    name: docker
+    state: present

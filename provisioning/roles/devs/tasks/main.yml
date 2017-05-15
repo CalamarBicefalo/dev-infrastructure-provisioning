@@ -1,0 +1,20 @@
+- name: Copy SSH config
+  copy:
+    src: ssh_config
+    dest: "{{ ansible_env.HOME }}/.ssh/config"
+
+- name: Copy hosts config
+  become: true
+  copy:
+    src: hosts_config
+    dest: "/etc/hosts"
+
+- name: Install git duet
+  homebrew:
+    name: git-duet
+    state: present
+
+- name: Install git crypt
+  homebrew:
+    name: git-crypt
+    state: present

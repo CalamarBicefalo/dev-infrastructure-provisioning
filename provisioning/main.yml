@@ -1,0 +1,14 @@
+---
+# This playbook configures development infrastructure including dev machines and CI
+
+- name: Configure dev machines
+  hosts: devs
+  roles:
+  - common
+  - devs
+
+- name: Configure CI machine
+  hosts: ci
+  roles:
+  - common
+  - ci

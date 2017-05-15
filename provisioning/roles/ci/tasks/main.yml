@@ -1,0 +1,69 @@
+- name: Install docker compose
+  homebrew:
+    name: docker-compose
+    state: present
+
+- name: Create concourse directory
+  file:
+    path: "{{ ansible_env.HOME }}/concourse"
+    state: directory
+
+# CONCOURSE -> Install concourse using docker compose set up
+- name: Copy concourse docker compose config
+  register: docker_compose_config
+  copy:
+    src: docker-compose.yml
+    dest: "{{ ansible_env.HOME }}/concourse/docker-compose.yml"
+
+
+# CONCOURSE -> WEB KEYS
+- name: Create web keys directory for concourse
+  register: concourse_web_keys
+  file:
+    path: "{{ ansible_env.HOME }}/concourse/keys/web"
+    state: directory
+
+- name: create tsa host key
+  when: concourse_web_keys.changed
+  command: ssh-keygen -t rsa -f ./keys/web/tsa_host_key -N ''
+  args:
+    chdir: "{{ ansible_env.HOME }}/concourse"
+
+- name: create session signing key
+  when: concourse_web_keys.changed
+  command: ssh-keygen -t rsa -f ./keys/web/session_signing_key -N ''
+  args:
+    chdir: "{{ ansible_env.HOME }}/concourse"
+
+# CONCOURSE ->  WORKER KEYS
+- name: Create worker keys directory for concourse
+  register: concourse_worker_keys
+  file:
+    path: "{{ ansible_env.HOME }}/concourse/keys/worker"
+    state: directory
+
+- name: create session signing key
+  when: concourse_worker_keys.changed
+  command: ssh-keygen -t rsa -f ./keys/worker/worker_key -N ''
+  args:
+    chdir: "{{ ansible_env.HOME }}/concourse"
+
+# CONCOURSE -> COPY KEYS
+- name: copy web tsa key to worker
+  copy:
+    remote_src: true
+    src: "{{ ansible_env.HOME }}/concourse/keys/web/tsa_host_key.pub"
+    dest: "{{ ansible_env.HOME }}/concourse/keys/worker"
+
+- name: copy worker key to web authorised keys
+  copy:
+    remote_src: true
+    src: "{{ ansible_env.HOME }}/concourse/keys/worker/worker_key.pub"
+    dest: "{{ ansible_env.HOME }}/concourse/keys/web/authorized_worker_keys"
+
+# RESTART CONCOURSE
+- name: Restart concourse
+  when: docker_compose_config.changed
+  command: /usr/local/bin/docker-compose restart
+  args:
+    chdir: "{{ ansible_env.HOME }}/concourse"
